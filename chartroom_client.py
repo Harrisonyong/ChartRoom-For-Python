@@ -14,13 +14,18 @@ sock = socket()
 sock.connect(ADDR)
 
 # 首先向服务端发送个人名称
-msg = input("请输入名字:")
-msg = "NAME " + msg
-sock.send(msg.encode())
-response = sock.recv(1024).decode()
-print(response)
-if response == "ok":
-# 循环向服务器发送和接收消息
-    while True:
-        data = sock.recv(1024*10)
-        print(data.decode())
+def talk():
+    pass
+
+
+while True:
+    msg = input("请输入名字:")
+    msg = "NAME " + msg
+    sock.send(msg.encode())
+    response = sock.recv(1024).decode()
+    # print(response)
+    if response == "ok":
+        talk()
+    elif response == "Fail":
+        print("存在重复的名称:")
+        continue

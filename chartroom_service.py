@@ -21,25 +21,30 @@ sockfd.listen(5)
 ep = epoll()
 ep.register(sockfd)
 map = {sockfd.fileno():sockfd}
-address = {}
-name = {}
+usr = {}
 # 循环监听客户端连接进行处理
 class Chart():
-    def __init__(self,connfd):
+    def __init__(self,connfd,addre,name = None):
         self.connfd = connfd
+        self.addre = addre
+        self.name = name
+
+    def join(self,index):
+        if index[0] == "NAME":
+            for n in usr.values():
+                if n.name == index[1]:
+                    self.connfd.send(b"Fail")
+                    return
+            else:
+                self.name = index[1]
+                self.connfd.send(b"ok")
 
     def start(self):
         while True:
             data = self.connfd.recv(1024*10).decode()
-            index = data.split(" ",1)[1]
+            index = data.split(" ",1)
             print(index)
-            if index == "NAME":
-                # self.connfd.send(b"ok")
-                self.join()
-            # self.connfd.send(b"Connect prepared")
-
-    def join(self):
-
+            self.join(index)
 
 
 def main():
@@ -54,13 +59,12 @@ def main():
                 connfd.setblocking(False)
                 ep.register(connfd)
                 map[connfd.fileno()] = connfd
-                address[connfd] = addre
+                # 存储连接客户端对象,对象中包含客户端信息和客户端使用方法
+                usr[connfd.fileno()] = Chart(connfd,addre)
             else:
                 # 如果客户端连接,启动客户端处理类进行处理
                 try:
-                    Chart(map[fileno]).start()
-                    g
-
+                    usr[fileno].start()
                 except BlockingIOError:
                     continue
 
